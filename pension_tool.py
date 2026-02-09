@@ -71,7 +71,8 @@ def get_combined_csv_files():
             df_temp = pd.read_csv(file_path, sep=',', encoding=encoding_method, encoding_errors='replace')
             print(f'Current file {file_path}')
             missing = None
-            if '改補' in file_path:
+            if '單位負擔退休金金額' not in df_temp.columns:
+                print('This file is 改補')
                 missing = set(trimmed_columns) - set(df_temp.columns)
                 is_changed = True
             else:
@@ -79,6 +80,8 @@ def get_combined_csv_files():
 
             if missing:
                 raise ValueError(f'Missing columns: {missing}')
+            else:
+                print('All columns are present.')
     
             if is_changed:
                 df_temp['單位負擔退休金金額'] = 0
@@ -101,15 +104,17 @@ def aggregate_combined_df(df_combined):
         .agg(lambda x: int(x.sum()) if x.dtype.kind in "biufc" else x.iloc[0])
     )
 
-    df_agg = df_agg[(df_agg['(代扣)自提退休金金額'] != 0) | (df_agg['單位負擔退休金金額'] != 0)]
-    return df_agg
+    df_agg_self = df_agg[(df_agg['(代扣)自提退休金金額'] != 0)]
+    df_agg_govt = df_agg[(df_agg['單位負擔退休金金額'] != 0)]
+    return df_agg_self, df_agg_govt
 
 
-def write_to_csv(df):
-    df.to_csv('./output/test_output.csv', index=False, encoding=encoding_method, errors = 'replace')
+def write_to_csv(df, type):
+    df.to_csv(f'./output/output_{type}.csv', index=False, encoding=encoding_method, errors = 'replace')
 
 
 check_encoding()
 df_combined = get_combined_csv_files()
-df_combined_agg = aggregate_combined_df(df_combined)
-write_to_csv(df_combined_agg)
+df_agg_self, df_agg_govt = aggregate_combined_df(df_combined)
+write_to_csv(df_agg_self, '自提')
+write_to_csv(df_agg_govt, '公提')
