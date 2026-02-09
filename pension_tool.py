@@ -30,7 +30,7 @@ def check_encoding():
                 with open(file_path, 'rb') as f:
                     res = chardet.detect(f.read())
                 
-                # print(file_path + ' ' + res['encoding'])
+                print(file_path + ' ' + res['encoding'])
                 if res['encoding'] != encoding_method:
                     raise ValueError('The encoding methods are not the same')
                 
@@ -72,7 +72,7 @@ def get_combined_csv_files():
             print(f'Current file {file_path}')
             missing = None
             if '單位負擔退休金金額' not in df_temp.columns:
-                print('This file is 改補')
+                print('This file is missing govt column')
                 missing = set(trimmed_columns) - set(df_temp.columns)
                 is_changed = True
             else:
@@ -87,6 +87,7 @@ def get_combined_csv_files():
                 df_temp['單位負擔退休金金額'] = 0
 
             df_temp = df_temp[columns]
+            print(df_temp.head(10))
             dfs.append(df_temp)
 
         df_combined = pd.concat(dfs, ignore_index=True)
@@ -104,8 +105,11 @@ def aggregate_combined_df(df_combined):
         .agg(lambda x: int(x.sum()) if x.dtype.kind in "biufc" else x.iloc[0])
     )
 
-    df_agg_self = df_agg[(df_agg['(代扣)自提退休金金額'] != 0)]
+    # df_agg = df_agg['(代扣)自提退休金金額'].astype('Int64')
+    df_agg_self = df_agg[(df_agg['(代扣)自提退休金金額'] != 0)] # bug. for some reason it's still including 0s
+    print(df_agg_self.dtypes)
     df_agg_govt = df_agg[(df_agg['單位負擔退休金金額'] != 0)]
+    print(df_agg_govt.dtypes)
     return df_agg_self, df_agg_govt
 
 
