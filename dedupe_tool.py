@@ -4,6 +4,11 @@
 # Goal: This is used for deduplicating 業務 files with duplicated SSNs.
 # Background: A lot of those 業務 files have duplicated SSNs and are causing issues 
 #             when we are going through our auditing processes.
+# How-to:
+# Run 'python dedupe_tool.py <path to csv file> (including csv extension)'
+# Will output to 'dedupe_output' and 'dupes_output'
+# 'dedupe_output' includes result set that's deduplicated
+# 'dupes_output' includes the duplicated rows that are pre-aggregated
 
 import argparse
 import chardet
