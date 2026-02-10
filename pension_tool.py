@@ -25,7 +25,8 @@ import chardet
 # (代扣)自提退休金金額
 # 單位負擔退休金金額
 
-folder_path = 'resources'
+folder_path = 'pension_resources'
+output_path = 'pension_output'
 encoding_method = 'Big5'
 
 
@@ -137,7 +138,7 @@ def aggregate_combined_df(df_combined):
 
 
 def write_to_csv(df, type):
-    df.to_csv(f'./output/output_{type}.csv', index=False, encoding=encoding_method, errors = 'replace')
+    df.to_csv(f'./{output_path}/output_{type}.csv', index=False, encoding=encoding_method, errors = 'replace')
 
 
 check_encoding()
