@@ -131,8 +131,10 @@ def aggregate_combined_df(df_combined):
 
     # filter out the 0s for both
     df_agg_self = df_agg[(df_agg['(代扣)自提退休金金額'] != 0)]
+    df_agg_self = df_agg_self[['姓名', '身分證字號', '(代扣)自提退休金金額']]
     print(df_agg_self.dtypes)
     df_agg_govt = df_agg[(df_agg['單位負擔退休金金額'] != 0)]
+    df_agg_govt = df_agg_govt[['姓名', '身分證字號', '單位負擔退休金金額']]
     print(df_agg_govt.dtypes)
     return df_agg_self, df_agg_govt
 
