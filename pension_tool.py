@@ -4,10 +4,19 @@
 # Goal: When calculating monthly pensions, we need to combine all the files
 #       we have for the previous month, and it's been all manual. Therefore,
 #       this tool will help us with automation.
+#
+# Good to know:
+# 1. Double check excel files are in CSV. This tool will not work for other file extensions
+# 2. Make sure excel files do not have unnecessary summation lines at the end
+#
+# How to:
+# 1. Drop all the files from previous month (改服, 補發, 大宗, 新梯) into the 'resources' folder
+#    So for example, if i'm working on 11510 pensions, i'd include all the files from October, 115.
+# 2. Run 'python pension_tool.py' in command line and the results will be outputted to 'output' folder
+# 3. 'output_自提' is for 自提, 'output_公提' is for 公提.
 
 import os
 import pandas as pd
-import argparse
 import chardet
 
 # columns to extract:
@@ -19,6 +28,9 @@ import chardet
 folder_path = 'resources'
 encoding_method = 'Big5'
 
+
+# This is to check encoding methods for all the input files to make sure
+# they are the same encoding methods.
 def check_encoding():
     global encoding_method
     res = None
@@ -44,6 +56,7 @@ def check_encoding():
         print(e)    
 
 
+# Combine all the entries for each SSN along with interested columns only.
 def get_combined_csv_files():
     columns = [
         '姓名',
@@ -52,7 +65,7 @@ def get_combined_csv_files():
         '單位負擔退休金金額'
     ]
 
-    # 改服用的
+    # files without 單位負擔退休金金額 column
     trimmed_columns = [
         '姓名',
         '身分證字號',
@@ -68,9 +81,12 @@ def get_combined_csv_files():
         for filename in os.listdir(folder_path):
             is_changed = False
             file_path = os.path.join(folder_path, filename)
+
             df_temp = pd.read_csv(file_path, sep=',', encoding=encoding_method, encoding_errors='replace')
             print(f'Current file {file_path}')
+
             missing = None
+
             if '單位負擔退休金金額' not in df_temp.columns:
                 print('This file is missing govt column')
                 missing = set(trimmed_columns) - set(df_temp.columns)
@@ -83,6 +99,7 @@ def get_combined_csv_files():
             else:
                 print('All columns are present.')
     
+            # manually add the missing column
             if is_changed:
                 df_temp['單位負擔退休金金額'] = 0
 
@@ -99,14 +116,20 @@ def get_combined_csv_files():
         print(e)
 
 
+# Aggregate all the duplicated SSNs
 def aggregate_combined_df(df_combined):
-    df_agg = (
-        df_combined.groupby("身分證字號", as_index=False)
-        .agg(lambda x: int(x.sum()) if x.dtype.kind in "biufc" else x.iloc[0])
-    )
+    try:
+        df_agg = (
+            df_combined.groupby("身分證字號", as_index=False)
+            .agg(lambda x: int(x.sum()) if x.dtype.kind in "biufc" else x.iloc[0])
+        )
+    
+    except Exception as e:
+        print('Error when aggregating data')
+        print(e)
 
-    # df_agg = df_agg['(代扣)自提退休金金額'].astype('Int64')
-    df_agg_self = df_agg[(df_agg['(代扣)自提退休金金額'] != 0)] # bug. for some reason it's still including 0s
+    # filter out the 0s for both
+    df_agg_self = df_agg[(df_agg['(代扣)自提退休金金額'] != 0)]
     print(df_agg_self.dtypes)
     df_agg_govt = df_agg[(df_agg['單位負擔退休金金額'] != 0)]
     print(df_agg_govt.dtypes)
