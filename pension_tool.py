@@ -10,9 +10,9 @@
 # 2. Make sure excel files do not have unnecessary summation lines at the end
 #
 # How-to:
-# 1. Drop all the files from previous month (改服, 補發, 大宗, 新梯) into the 'resources' folder
+# 1. Drop all the files from previous month (改服, 補發, 大宗, 新梯) into the 'pension_resources' folder
 #    So for example, if i'm working on 11510 pensions, i'd include all the files from October, 115.
-# 2. Run 'python pension_tool.py' in command line and the results will be outputted to 'output' folder
+# 2. Run 'python pension_tool.py' in command line and the results will be outputted to 'pension_output' folder
 # 3. 'output_自提' is for 自提, 'output_公提' is for 公提.
 
 import os
