@@ -18,7 +18,7 @@ This repository contains two Python tools designed to automate pension-related d
 * Required packages:
 
   ```bash
-  pip install pandas chardet
+  pip install -r requirements.txt
   ```
 
 ---
