@@ -207,11 +207,11 @@ marimo/_lsp/
 __marimo__/
 
 # Personal
-# resources/
-# output/
-# pension_resources/
-# pension_output/
-# dedupe_output/
-# dedupe_resources/
-# dupes_output/
+resources/
+output/
+pension_resources/
+pension_output/
+dedupe_output/
+dedupe_resources/
+dupes_output/
 .vscode/
